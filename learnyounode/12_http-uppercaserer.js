@@ -1,16 +1,48 @@
-//learnyounode-11
+//learnyounode-12
 
-//Mi idea (corregida) original
-var fs = require('fs');
+var map = require('through2-map');
 var http = require('http');
 
 var server = http.createServer(function(req, res){
-	fs.createReadStream(process.argv[3]).pipe(res); // el write estaba de mas
+	if(req.method === 'POST'){
+		req.pipe(map((chunk) => {
+			return chunk.toString().toUpperCase();
+		})).pipe(res);
+		
+/*
+algunos intentos previos:
+
+
+		req.pipe(map((chunk) => {
+			return chunk.toString().toUpperCase();
+		})).pipe((res) => {console.log(res)});
+
+
+		req.on('data', (chunk) => {
+			console.log(chunk);
+		});
+		req.on('end', () => {
+			console.log(':>');
+		});
+*/
+	}
+
 });
 
 server.listen(process.argv[2]);
 
-/*
+/* un intento raro sin ayuda de paquetes
+
+		let body = ''
+		req.on('data', (chunk) => {
+			body += chunk.toString();
+		});
+		req.on('end', () => {
+			req.pipe(body.toUpperCase());
+		});
+		
+		
+
 //Mi idea (incorrecta) original
 var fs = require('fs');
 var http = require('http');
